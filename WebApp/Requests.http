@@ -1,0 +1,67 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+GET https://localhost:7154/todos
+
+###
+
+GET https://localhost:7154/todos/2
+
+###
+
+POST https://localhost:7154/todos
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "First ToDo",
+  "dueDate": "2024-04-05",
+  "isCompleted": false
+}
+
+###
+
+DELETE https://localhost:7154/todos/2
+
+###
+
+GET https://localhost:7154/clubs
+
+###
+
+GET https://localhost:7154/clubs/3
+
+###
+
+POST https://localhost:7154/clubs
+Content-Type: application/json
+
+{
+  "name": "Manchester United"
+}
+
+###
+
+DELETE https://localhost:7154/clubs/1
+
+###
+
+GET https://localhost:7154/players
+
+###
+
+GET https://localhost:7154/players/1
+
+###
+
+POST https://localhost:7154/players
+Content-Type: application/json
+
+{
+  "name": "Markus Larsson",
+  "clubId": 3
+}
+
+###
+
+DELETE https://localhost:7154/players/1
+
+###
