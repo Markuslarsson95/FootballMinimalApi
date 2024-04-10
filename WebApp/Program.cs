@@ -24,5 +24,5 @@ if (app.Environment.IsDevelopment())
 
 app.RegisterPlayerEndpoints();
 app.RegisterClubEndpoints();
-
+//TEST
 app.Run();
