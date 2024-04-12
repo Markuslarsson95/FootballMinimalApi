@@ -1,11 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.DTOs.Club;
+using WebApp.Models;
 
 namespace WebApp.Endpoints
 {
     public static class ClubEndpoints
     {
+
         public static void RegisterClubEndpoints(this WebApplication app)
         {
             var clubs = app.MapGroup("/clubs");
@@ -16,36 +19,17 @@ namespace WebApp.Endpoints
             clubs.MapPut("/{id}", UpdateClub);
             clubs.MapDelete("/{id}", RemoveClub);
 
-            static async Task<IResult> GetAllClubs(AppDb db, int page = 1, int pageSize = 10)
+            static async Task<IResult> GetAllClubs(AppDb db)
             {
                 try
                 {
-                    var totalClubsCount = await db.Clubs.CountAsync();
-                    var totalPages = (int)Math.Ceiling((double)totalClubsCount / pageSize);
-
-                    if (page < 1 || page > totalPages)
-                    {
-                        return TypedResults.BadRequest($"Invalid page number. Page number should be between 1 and {totalPages}.");
-                    }
-
                     var clubs = await db.Clubs
-                        .OrderBy(x => x.Name)
-                        .Skip((page - 1) * pageSize)
-                        .Take(pageSize)
-                        .Select(x => new GetClubsDto(
-                            x.Id,
-                            x.Name,
-                            x.LeaguePoints,
-                            x.Players)
-                        ).ToListAsync();
+                        .Include(x => x.Players)
+                        .ToListAsync();
 
-                    var response = new
-                    {
-                        TotalPages = totalPages,
-                        Clubs = clubs
-                    };
+                    var clubDto = clubs.Adapt<List<ClubResponse>>();
 
-                    return TypedResults.Ok(response);
+                    return TypedResults.Ok(clubDto);
                 }
                 catch (Exception ex)
                 {
@@ -56,63 +40,105 @@ namespace WebApp.Endpoints
 
             static async Task<IResult> GetClubById(int id, AppDb db)
             {
-                return await db.Clubs
-                    .Where(x => x.Id == id)
-                    .Select(c => new GetClubsDto(
-                        c.Id,
-                        c.Name,
-                        c.LeaguePoints,
-                        c.Players)
-                    ).FirstOrDefaultAsync()
-                is GetClubsDto clubDto
-                ? TypedResults.Ok(clubDto)
-                : TypedResults.BadRequest();
-            }
-
-            static async Task<IResult> CreateClub(CreateClubDto clubDto, AppDb db)
-            {
-                var club = new Club
+                try
                 {
-                    Name = clubDto.Name,
-                    LeaguePoints = clubDto.LeaguePoints,
-                };
-                db.Clubs.Add(club);
-                await db.SaveChangesAsync();
+                    var club = await db.Clubs
+                    .Where(x => x.Id == id)
+                    .Include(x => x.Players)
+                    .FirstOrDefaultAsync();
 
-                clubDto = new CreateClubDto(club.Name, club.LeaguePoints);
+                    if (club == null)
+                        return TypedResults.NotFound($"No Club found with id {id}");
+                    var clubDtoResponse = club.Adapt<ClubResponse>();
 
-                return TypedResults.Created($"/clubs/{club.Id}", clubDto);
+                    return clubDtoResponse
+                    is ClubResponse clubDto
+                    ? TypedResults.Ok(clubDtoResponse)
+                    : TypedResults.BadRequest();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while retrieving clubs: {ex.Message}");
+                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+                }
+
             }
 
-            static async Task<IResult> UpdateClub(int id, UpdateClubDto clubDto, AppDb db)
+            static async Task<IResult> CreateClub(CreateClubDto createClubDto, AppDb db)
             {
-                var club = await db.Clubs
+                try
+                {
+                    var club = new Club
+                    {
+                        Name = createClubDto.Name,
+                        LeaguePoints = createClubDto.LeaguePoints,
+                        MatchesPlayed = createClubDto.MatchesPlayed,
+                        Wins = createClubDto.Wins,
+                        Losses = createClubDto.Losses,
+                        Drawns = createClubDto.Drawns,
+                        Goals = createClubDto.Goals,
+                        GoalsConceded = createClubDto.GoalsConceded,
+                        CleanSheets = createClubDto.CleanSheets,
+                        YearFounded = createClubDto.YearFounded
+                    };
+
+                    db.Clubs.Add(club);
+                    await db.SaveChangesAsync();
+
+                    return TypedResults.Created($"/clubs/{club.Id}", club.Adapt<ClubResponse>());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while retrieving clubs: {ex.Message}");
+                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+                }
+
+            }
+
+            static async Task<IResult> UpdateClub(int id, UpdateClubDto updateClubDto, AppDb db)
+            {
+                try
+                {
+                    var club = await db.Clubs
                    .Where(c => c.Id == id)
                    .FirstOrDefaultAsync();
 
-                if (club is null)
-                    return Results.NotFound();
+                    if (club is null)
+                        return Results.NotFound($"No Club found with id {id}");
 
-                club.Name = clubDto.Name;
-                club.LeaguePoints = clubDto.LeaguePoints;
+                    var clubUpdate = updateClubDto.Adapt(club);
 
-                await db.SaveChangesAsync();
+                    await db.SaveChangesAsync();
 
-                return Results.NoContent();
+                    return Results.NoContent();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while retrieving clubs: {ex.Message}");
+                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+                }
             }
 
             static async Task<IResult> RemoveClub(int id, AppDb db)
             {
-                var club = await db.Clubs.FindAsync(id);
-                if (club is Club)
+                try
                 {
-                    if (!club.Players.IsNullOrEmpty())
-                        return Results.BadRequest("Remove player(s) first");
-                    db.Clubs.Remove(club);
-                    await db.SaveChangesAsync();
-                    return Results.NoContent();
+                    var club = await db.Clubs.FindAsync(id);
+                    if (club is Club)
+                    {
+                        if (!club.Players.IsNullOrEmpty())
+                            return Results.BadRequest("Remove player(s) first");
+                        db.Clubs.Remove(club);
+                        await db.SaveChangesAsync();
+                        return Results.NoContent();
+                    }
+                    return Results.NotFound($"No Club found with id {id}");
                 }
-                return Results.NotFound();
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while retrieving clubs: {ex.Message}");
+                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+                }
             }
         }
     }

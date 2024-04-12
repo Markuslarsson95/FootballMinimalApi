@@ -1,4 +1,4 @@
-﻿namespace WebApp.DTOs.Club
+﻿namespace WebApp.DTOs.Player
 {
     public record UpdatePlayerDto(string FirstName, string LastName, int ClubId);
 }

@@ -1,6 +1,8 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using WebApp;
 using WebApp.Endpoints;
+using WebApp.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<AppDb>(opt => opt.UseSqlServer("Server = (localdb)\\MSSQLLocalDB; Database = Football; Integrated Security = true"));
@@ -9,6 +11,9 @@ builder.Services.AddDbContext<AppDb>(opt => opt.UseSqlServer("Server=(local)\\SQ
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMapster();
+MapsterConfig.Configure();
 
 var app = builder.Build();
 
@@ -24,5 +29,5 @@ if (app.Environment.IsDevelopment())
 
 app.RegisterPlayerEndpoints();
 app.RegisterClubEndpoints();
-//TEST
+
 app.Run();
