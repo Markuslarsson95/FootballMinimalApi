@@ -9,13 +9,13 @@ namespace WebApp.Mappings
     {
         public static void Configure()
         {
-            // Configure Club to ClubDto
+            // Configure Club to ClubResponseDto
             TypeAdapterConfig<Club, ClubResponse>.NewConfig()
                 .Map(dest => dest.Players, src => src.Players.Adapt<List<PlayerResponse>>());
 
-            // Configure Player to PlayerDto
-            //TypeAdapterConfig<Player, CreatePlayerDto>.NewConfig()
-            //    .Map(dest => dest.Club, src => src.Club.Adapt<CreateClubDto>());
+            // Configure Player to PlayerResponseDto
+            TypeAdapterConfig<Player, PlayerResponse>.NewConfig()
+                .Map(dest => dest.Club, src => src.Club.Name);
         }
     }
 }
