@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMapster();
 MapsterConfig.Configure();
-
+//test push
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
