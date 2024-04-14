@@ -4,13 +4,13 @@ using WebApp.Models;
 
 namespace WebApp
 {
-    public class AppDb : DbContext
+    public class FootballDbContext : DbContext
     {
-        //public DbSet<Todo> Todos => Set<Todo>();
+        public DbSet<Stadium> Stadiums { get; set; }
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Player> Players { get; set; }
 
-        public AppDb(DbContextOptions<AppDb> options)
+        public FootballDbContext(DbContextOptions<FootballDbContext> options)
         : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -21,6 +21,8 @@ namespace WebApp
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            DbSeedData.SeedStadiums(modelBuilder);
 
             DbSeedData.SeedClubs(modelBuilder);
         }

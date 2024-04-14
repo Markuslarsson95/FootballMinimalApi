@@ -17,7 +17,7 @@ namespace WebApp.Endpoints
             players.MapPut("/{id}", UpdatePlayer);
             players.MapDelete("/{id}", RemovePlayer);
 
-            static async Task<IResult> GetAllPlayers(AppDb db)
+            static async Task<IResult> GetAllPlayers(FootballDbContext db)
             {
                 try
                 {
@@ -25,7 +25,7 @@ namespace WebApp.Endpoints
                         .Include(x => x.Club)
                         .ToListAsync();
 
-                    var playerDto = players.Adapt<List<PlayerResponse>>();
+                    var playerDto = players.Adapt<List<PlayerResponseDto>>();
 
                     return TypedResults.Ok(playerDto);
                 }
@@ -36,7 +36,7 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> GetPlayerById(int id, AppDb db)
+            static async Task<IResult> GetPlayerById(int id, FootballDbContext db)
             {
                 try
                 {
@@ -47,10 +47,10 @@ namespace WebApp.Endpoints
 
                     if (player == null)
                         return TypedResults.NotFound($"No Player found with id {id}");
-                    var playerDtoResponse = player.Adapt<PlayerResponse>();
+                    var playerDtoResponse = player.Adapt<PlayerResponseDto>();
 
                     return playerDtoResponse
-                    is PlayerResponse playerDto
+                    is PlayerResponseDto playerDto
                     ? TypedResults.Ok(playerDtoResponse)
                     : TypedResults.BadRequest();
                 }
@@ -61,7 +61,7 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, AppDb db)
+            static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, FootballDbContext db)
             {
                 try
                 {
@@ -80,7 +80,7 @@ namespace WebApp.Endpoints
                     db.Players.Add(player);
                     await db.SaveChangesAsync();
 
-                    return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponse>());
+                    return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponseDto>());
                 }
                 catch (Exception ex)
                 {
@@ -90,7 +90,7 @@ namespace WebApp.Endpoints
 
             }
 
-            static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, AppDb db)
+            static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, FootballDbContext db)
             {
                 try
                 {
@@ -114,7 +114,7 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> RemovePlayer(int id, AppDb db)
+            static async Task<IResult> RemovePlayer(int id, FootballDbContext db)
             {
                 try
                 {

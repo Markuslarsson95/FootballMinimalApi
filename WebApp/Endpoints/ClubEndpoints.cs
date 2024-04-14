@@ -8,7 +8,6 @@ namespace WebApp.Endpoints
 {
     public static class ClubEndpoints
     {
-
         public static void RegisterClubEndpoints(this WebApplication app)
         {
             var clubs = app.MapGroup("/clubs");
@@ -19,15 +18,16 @@ namespace WebApp.Endpoints
             clubs.MapPut("/{id}", UpdateClub);
             clubs.MapDelete("/{id}", RemoveClub);
 
-            static async Task<IResult> GetAllClubs(AppDb db)
+            static async Task<IResult> GetAllClubs(FootballDbContext db)
             {
                 try
                 {
                     var clubs = await db.Clubs
+                        .Include(x => x.Stadium)
                         .Include(x => x.Players)
                         .ToListAsync();
 
-                    var clubDto = clubs.Adapt<List<ClubResponse>>();
+                    var clubDto = clubs.Adapt<List<ClubResponseDto>>();
 
                     return TypedResults.Ok(clubDto);
                 }
@@ -38,21 +38,22 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> GetClubById(int id, AppDb db)
+            static async Task<IResult> GetClubById(int id, FootballDbContext db)
             {
                 try
                 {
                     var club = await db.Clubs
                     .Where(x => x.Id == id)
+                    .Include(x => x.Stadium)
                     .Include(x => x.Players)
                     .FirstOrDefaultAsync();
 
                     if (club == null)
                         return TypedResults.NotFound($"No Club found with id {id}");
-                    var clubDtoResponse = club.Adapt<ClubResponse>();
+                    var clubDtoResponse = club.Adapt<ClubResponseDto>();
 
                     return clubDtoResponse
-                    is ClubResponse clubDto
+                    is ClubResponseDto clubDto
                     ? TypedResults.Ok(clubDtoResponse)
                     : TypedResults.BadRequest();
                 }
@@ -64,7 +65,7 @@ namespace WebApp.Endpoints
 
             }
 
-            static async Task<IResult> CreateClub(CreateClubDto createClubDto, AppDb db)
+            static async Task<IResult> CreateClub(CreateClubDto createClubDto, FootballDbContext db)
             {
                 try
                 {
@@ -85,7 +86,7 @@ namespace WebApp.Endpoints
                     db.Clubs.Add(club);
                     await db.SaveChangesAsync();
 
-                    return TypedResults.Created($"/clubs/{club.Id}", club.Adapt<ClubResponse>());
+                    return TypedResults.Created($"/clubs/{club.Id}", club.Adapt<ClubResponseDto>());
                 }
                 catch (Exception ex)
                 {
@@ -95,7 +96,7 @@ namespace WebApp.Endpoints
 
             }
 
-            static async Task<IResult> UpdateClub(int id, UpdateClubDto updateClubDto, AppDb db)
+            static async Task<IResult> UpdateClub(int id, UpdateClubDto updateClubDto, FootballDbContext db)
             {
                 try
                 {
@@ -119,7 +120,7 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> RemoveClub(int id, AppDb db)
+            static async Task<IResult> RemoveClub(int id, FootballDbContext db)
             {
                 try
                 {
