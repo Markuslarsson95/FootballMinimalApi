@@ -5,8 +5,8 @@ using WebApp.Endpoints;
 using WebApp.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<FootballDbContext>(opt => opt.UseSqlServer("Server = (localdb)\\MSSQLLocalDB; Database = Football; Integrated Security = true"));
-//builder.Services.AddDbContext<AppDb>(opt => opt.UseSqlServer("Server=(local)\\SQLEXPRESS;Database=Football;Trusted_Connection=True;TrustServerCertificate=true"));
+//builder.Services.AddDbContext<FootballDbContext>(opt => opt.UseSqlServer("Server = (localdb)\\MSSQLLocalDB; Database = Football; Integrated Security = true"));
+builder.Services.AddDbContext<FootballDbContext>(opt => opt.UseSqlServer("Server=(local)\\SQLEXPRESS;Database=Football;Trusted_Connection=True;TrustServerCertificate=true"));
 
 builder.Services.AddEndpointsApiExplorer();
 

@@ -27,9 +27,7 @@ namespace WebApp.Endpoints
                         .Include(x => x.Club)
                         .ToListAsync();
 
-                    var stadiumDto = stadiums.Adapt<List<StadiumResponseDto>>();
-
-                    return TypedResults.Ok(stadiumDto);
+                    return TypedResults.Ok(stadiums.Adapt<List<StadiumResponseDto>>());
                 }
                 catch (Exception ex)
                 {
@@ -87,18 +85,16 @@ namespace WebApp.Endpoints
             {
                 try
                 {
-                    var stadium = await db.Stadiums
-                   .Where(c => c.Id == id)
-                   .FirstOrDefaultAsync();
+                    var stadium = await db.Stadiums.FindAsync(id);
 
-                    if (stadium is null)
-                        return Results.NotFound($"No Stadium found with id {id}");
+                    if (stadium is Stadium)
+                    {
+                        updateStadiumDto.Adapt(stadium);
+                        await db.SaveChangesAsync();
 
-                    var stadiumUpdate = updateStadiumDto.Adapt(stadium);
-
-                    await db.SaveChangesAsync();
-
-                    return Results.NoContent();
+                        return Results.NoContent();
+                    }
+                    return Results.NotFound($"No Stadium found with id {id}");
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +107,10 @@ namespace WebApp.Endpoints
             {
                 try
                 {
-                    var stadium = await db.Stadiums.FindAsync(id);
+                    var stadium = await db.Stadiums
+                        .Include(x => x.Club)
+                        .FirstOrDefaultAsync(x => x.Id == id);
+
                     if (stadium is Stadium)
                     {
                         //if (!stadium.Club.null
@@ -124,10 +123,11 @@ namespace WebApp.Endpoints
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"An error occurred while retrieving stadiums: {ex.Message}");
+                    Console.WriteLine($"An error occurred while removing stadium: {ex.Message}");
                     return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
+
         }
     }
 }

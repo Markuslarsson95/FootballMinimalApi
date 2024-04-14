@@ -12,7 +12,7 @@ using WebApp;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
-    [Migration("20240414190802_initial")]
+    [Migration("20240415162632_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -58,7 +58,7 @@ namespace WebApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StadiumId")
+                    b.Property<int?>("StadiumId")
                         .HasColumnType("int");
 
                     b.Property<int>("Wins")
@@ -70,7 +70,8 @@ namespace WebApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("StadiumId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[StadiumId] IS NOT NULL");
 
                     b.ToTable("Clubs");
 
@@ -385,7 +386,7 @@ namespace WebApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClubId")
+                    b.Property<int?>("ClubId")
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("DateOfBirth")
@@ -637,9 +638,7 @@ namespace WebApp.Migrations
                 {
                     b.HasOne("WebApp.Models.Stadium", "Stadium")
                         .WithOne("Club")
-                        .HasForeignKey("WebApp.Models.Club", "StadiumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WebApp.Models.Club", "StadiumId");
 
                     b.Navigation("Stadium");
                 });
@@ -648,9 +647,7 @@ namespace WebApp.Migrations
                 {
                     b.HasOne("WebApp.Models.Club", "Club")
                         .WithMany("Players")
-                        .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClubId");
 
                     b.Navigation("Club");
                 });

@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using WebApp.DTOs.Club;
 using WebApp.Models;
 
@@ -67,25 +66,33 @@ namespace WebApp.Endpoints
 
             static async Task<IResult> CreateClub(CreateClubDto createClubDto, FootballDbContext db)
             {
+                if (createClubDto.StadiumId != null)
+                {
+                    var stadium = await db.Stadiums.Include(x => x.Club).FirstOrDefaultAsync(x => x.Id == createClubDto.StadiumId);
+                    if (stadium is null)
+                        return TypedResults.NotFound($"No Stadium found with id {createClubDto.StadiumId}.");
+                    if (stadium.Club != null)
+                        return TypedResults.BadRequest($"Stadium with id {createClubDto.StadiumId} already has a club");
+                }
+
+                var club = new Club
+                {
+                    StadiumId = createClubDto.StadiumId,
+                    Name = createClubDto.Name,
+                    LeaguePoints = createClubDto.LeaguePoints,
+                    MatchesPlayed = createClubDto.MatchesPlayed,
+                    Wins = createClubDto.Wins,
+                    Losses = createClubDto.Losses,
+                    Drawns = createClubDto.Drawns,
+                    Goals = createClubDto.Goals,
+                    GoalsConceded = createClubDto.GoalsConceded,
+                    CleanSheets = createClubDto.CleanSheets,
+                    YearFounded = createClubDto.YearFounded
+                };
                 try
                 {
-                    var club = new Club
-                    {
-                        Name = createClubDto.Name,
-                        LeaguePoints = createClubDto.LeaguePoints,
-                        MatchesPlayed = createClubDto.MatchesPlayed,
-                        Wins = createClubDto.Wins,
-                        Losses = createClubDto.Losses,
-                        Drawns = createClubDto.Drawns,
-                        Goals = createClubDto.Goals,
-                        GoalsConceded = createClubDto.GoalsConceded,
-                        CleanSheets = createClubDto.CleanSheets,
-                        YearFounded = createClubDto.YearFounded
-                    };
-
                     db.Clubs.Add(club);
                     await db.SaveChangesAsync();
-
                     return TypedResults.Created($"/clubs/{club.Id}", club.Adapt<ClubResponseDto>());
                 }
                 catch (Exception ex)
@@ -100,18 +107,15 @@ namespace WebApp.Endpoints
             {
                 try
                 {
-                    var club = await db.Clubs
-                   .Where(c => c.Id == id)
-                   .FirstOrDefaultAsync();
+                    var club = await db.Clubs.FindAsync(id);
 
-                    if (club is null)
-                        return Results.NotFound($"No Club found with id {id}");
-
-                    var clubUpdate = updateClubDto.Adapt(club);
-
-                    await db.SaveChangesAsync();
-
-                    return Results.NoContent();
+                    if (club is Club)
+                    {
+                        updateClubDto.Adapt(club);
+                        await db.SaveChangesAsync();
+                        return Results.NoContent();
+                    }
+                    return Results.NotFound($"No Club found with id {id}");
                 }
                 catch (Exception ex)
                 {
@@ -124,11 +128,12 @@ namespace WebApp.Endpoints
             {
                 try
                 {
-                    var club = await db.Clubs.FindAsync(id);
+                    var club = await db.Clubs
+                        .Include(x => x.Players)
+                        .FirstOrDefaultAsync(x => x.Id == id);
+
                     if (club is Club)
                     {
-                        if (!club.Players.IsNullOrEmpty())
-                            return Results.BadRequest("Remove player(s) first");
                         db.Clubs.Remove(club);
                         await db.SaveChangesAsync();
                         return Results.NoContent();

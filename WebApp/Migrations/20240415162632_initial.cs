@@ -36,7 +36,7 @@ namespace WebApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StadiumId = table.Column<int>(type: "int", nullable: false),
+                    StadiumId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LeaguePoints = table.Column<int>(type: "int", nullable: false),
                     MatchesPlayed = table.Column<int>(type: "int", nullable: false),
@@ -55,8 +55,7 @@ namespace WebApp.Migrations
                         name: "FK_Clubs_Stadiums_StadiumId",
                         column: x => x.StadiumId,
                         principalTable: "Stadiums",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -67,7 +66,7 @@ namespace WebApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClubId = table.Column<int>(type: "int", nullable: false),
+                    ClubId = table.Column<int>(type: "int", nullable: true),
                     Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
@@ -81,8 +80,7 @@ namespace WebApp.Migrations
                         name: "FK_Players_Clubs_ClubId",
                         column: x => x.ClubId,
                         principalTable: "Clubs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -143,7 +141,8 @@ namespace WebApp.Migrations
                 name: "IX_Clubs_StadiumId",
                 table: "Clubs",
                 column: "StadiumId",
-                unique: true);
+                unique: true,
+                filter: "[StadiumId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Players_ClubId",
