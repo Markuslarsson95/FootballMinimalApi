@@ -1,7 +1,7 @@
 ﻿namespace WebApp.DTOs.Club
 {
     public record CreateClubDto(
-        string Name, 
+        string Name,
         int LeaguePoints,
         int MatchesPlayed,
         int Wins,
@@ -10,5 +10,6 @@
         int Goals,
         int GoalsConceded,
         int CleanSheets,
-        int YearFounded);
+        int YearFounded,
+        int StadiumId);
 }
