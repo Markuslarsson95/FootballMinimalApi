@@ -1,8 +1,10 @@
-﻿namespace WebApp.DTOs.Club
+﻿using WebApp.DTOs.Player;
+
+namespace WebApp.DTOs.Club
 {
-    public record UpdateClubDto(
-        int? StadiumId,
+    public record ClubResponseDto(int Id, 
         string Name, 
+        string Stadium, 
         int LeaguePoints,
         int MatchesPlayed,
         int Wins,
@@ -11,5 +13,6 @@
         int Goals,
         int GoalsConceded,
         int CleanSheets,
-        int YearFounded);
+        int YearFounded,
+        List<PlayerResponseDto> Players);
 }

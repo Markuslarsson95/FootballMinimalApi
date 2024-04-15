@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using WebApp.DTOs.Club;
 using WebApp.DTOs.Player;
+using WebApp.DTOs.Stadium;
 using WebApp.Models;
 
 namespace WebApp.Mappings
@@ -10,11 +11,16 @@ namespace WebApp.Mappings
         public static void Configure()
         {
             // Configure Club to ClubResponseDto
-            TypeAdapterConfig<Club, ClubResponse>.NewConfig()
-                .Map(dest => dest.Players, src => src.Players.Adapt<List<PlayerResponse>>());
+            TypeAdapterConfig<Club, ClubResponseDto>.NewConfig()
+                .Map(dest => dest.Stadium, src => src.Stadium.Name)
+                .Map(dest => dest.Players, src => src.Players.Adapt<List<PlayerResponseDto>>());
 
             // Configure Player to PlayerResponseDto
-            TypeAdapterConfig<Player, PlayerResponse>.NewConfig()
+            TypeAdapterConfig<Player, PlayerResponseDto>.NewConfig()
+                .Map(dest => dest.Club, src => src.Club.Name);
+
+            // Configure Stadium to StadiumResponseDto
+            TypeAdapterConfig<Stadium, StadiumResponseDto>.NewConfig()
                 .Map(dest => dest.Club, src => src.Club.Name);
         }
     }

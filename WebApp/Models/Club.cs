@@ -3,6 +3,8 @@
     public class Club
     {
         public int Id { get; set; }
+        public int? StadiumId { get; set; }
+        public Stadium? Stadium { get; set; } = null!;
         public required string Name { get; set; }
         public int LeaguePoints { get; set; }
         public int MatchesPlayed { get; set; }

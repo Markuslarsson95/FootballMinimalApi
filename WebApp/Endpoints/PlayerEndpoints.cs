@@ -17,7 +17,7 @@ namespace WebApp.Endpoints
             players.MapPut("/{id}", UpdatePlayer);
             players.MapDelete("/{id}", RemovePlayer);
 
-            static async Task<IResult> GetAllPlayers(AppDb db)
+            static async Task<IResult> GetAllPlayers(FootballDbContext db)
             {
                 try
                 {
@@ -25,7 +25,7 @@ namespace WebApp.Endpoints
                         .Include(x => x.Club)
                         .ToListAsync();
 
-                    var playerDto = players.Adapt<List<PlayerResponse>>();
+                    var playerDto = players.Adapt<List<PlayerResponseDto>>();
 
                     return TypedResults.Ok(playerDto);
                 }
@@ -36,7 +36,7 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> GetPlayerById(int id, AppDb db)
+            static async Task<IResult> GetPlayerById(int id, FootballDbContext db)
             {
                 try
                 {
@@ -47,10 +47,10 @@ namespace WebApp.Endpoints
 
                     if (player == null)
                         return TypedResults.NotFound($"No Player found with id {id}");
-                    var playerDtoResponse = player.Adapt<PlayerResponse>();
+                    var playerDtoResponse = player.Adapt<PlayerResponseDto>();
 
                     return playerDtoResponse
-                    is PlayerResponse playerDto
+                    is PlayerResponseDto playerDto
                     ? TypedResults.Ok(playerDtoResponse)
                     : TypedResults.BadRequest();
                 }
@@ -61,51 +61,32 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, AppDb db)
+            static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, FootballDbContext db)
             {
+
+                if (createPlayerDto.ClubId != null)
+                {
+                    var club = await db.Clubs.FindAsync(createPlayerDto.ClubId);
+                    if (club is null)
+                        return TypedResults.NotFound($"No club found with id {createPlayerDto.ClubId}.");
+                }
+
+                var player = new Player
+                {
+                    FirstName = createPlayerDto.FirstName,
+                    LastName = createPlayerDto.LastnName,
+                    ClubId = createPlayerDto.ClubId,
+                    Position = createPlayerDto.Position,
+                    Nationality = createPlayerDto.Nationality,
+                    DateOfBirth = createPlayerDto.DateOfBirth,
+                    KitNumber = createPlayerDto.KitNumber,
+                    Height = createPlayerDto.Height
+                };
                 try
                 {
-                    var player = new Player
-                    {
-                        FirstName = createPlayerDto.FirstName,
-                        LastName = createPlayerDto.LastnName,
-                        ClubId = createPlayerDto.ClubId,
-                        Position = createPlayerDto.Position,
-                        Nationality = createPlayerDto.Nationality,
-                        DateOfBirth = createPlayerDto.DateOfBirth,
-                        KitNumber = createPlayerDto.KitNumber,
-                        Height = createPlayerDto.Height
-                    };
-
                     db.Players.Add(player);
                     await db.SaveChangesAsync();
-
-                    return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponse>());
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-                }
-
-            }
-
-            static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, AppDb db)
-            {
-                try
-                {
-                    var player = await db.Players
-                   .Where(c => c.Id == id)
-                   .FirstOrDefaultAsync();
-
-                    if (player is null)
-                        return Results.NotFound($"No Player found with id {id}");
-
-                    var clubUpdate = updatePlayerDto.Adapt(player);
-
-                    await db.SaveChangesAsync();
-
-                    return Results.NoContent();
+                    return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponseDto>());
                 }
                 catch (Exception ex)
                 {
@@ -114,19 +95,25 @@ namespace WebApp.Endpoints
                 }
             }
 
-            static async Task<IResult> RemovePlayer(int id, AppDb db)
+            static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, FootballDbContext db)
             {
                 try
                 {
                     var player = await db.Players.FindAsync(id);
 
-                    if (player is null)
-                        return Results.NotFound($"No Player found with id {id}");
-
-                    db.Players.Remove(player);
-                    await db.SaveChangesAsync();
-
-                    return Results.NoContent();
+                    if (player is Player)
+                    {
+                        if (updatePlayerDto.ClubId != null)
+                        {
+                            var club = await db.Clubs.FindAsync(updatePlayerDto.ClubId);
+                            if (club is null)
+                                return TypedResults.NotFound($"No club found with id {updatePlayerDto.ClubId}.");
+                        }
+                        updatePlayerDto.Adapt(player);
+                        await db.SaveChangesAsync();
+                        return Results.NoContent();
+                    }
+                    return Results.NotFound($"No Player found with id {id}");
                 }
                 catch (Exception ex)
                 {
@@ -135,7 +122,26 @@ namespace WebApp.Endpoints
                 }
             }
 
+            static async Task<IResult> RemovePlayer(int id, FootballDbContext db)
+            {
+                try
+                {
+                    var player = await db.Players.FindAsync(id);
 
+                    if (player is Player)
+                    {
+                        db.Players.Remove(player);
+                        await db.SaveChangesAsync();
+                        return Results.NoContent();
+                    }
+                    return Results.NotFound($"No Player found with id {id}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
+                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+                }
+            }
         }
     }
 }
