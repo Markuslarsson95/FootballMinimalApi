@@ -1,6 +1,8 @@
 ﻿namespace WebApp.DTOs.Stadium
 {
-    public record StadiumResponseDto(string Name,
+    public record StadiumResponseDto(
+        int Id,
+        string Name,
         string Location,
         int Capacity,
         int YearBuilt,
