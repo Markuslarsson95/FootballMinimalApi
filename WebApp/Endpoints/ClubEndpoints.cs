@@ -111,6 +111,11 @@ namespace WebApp.Endpoints
 
                     if (club is Club)
                     {
+                        var stadium = await db.Stadiums.Include(x => x.Club).FirstOrDefaultAsync(x => x.Id == updateClubDto.StadiumId);
+                        if (stadium is null)
+                            return TypedResults.NotFound($"No Stadium found with id {updateClubDto.StadiumId}.");
+                        if (stadium.Club != null)
+                            return TypedResults.BadRequest($"Stadium with id {updateClubDto.StadiumId} already has a club");
                         updateClubDto.Adapt(club);
                         await db.SaveChangesAsync();
                         return Results.NoContent();

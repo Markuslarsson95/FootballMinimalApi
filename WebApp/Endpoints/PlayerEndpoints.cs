@@ -103,6 +103,12 @@ namespace WebApp.Endpoints
 
                     if (player is Player)
                     {
+                        if (updatePlayerDto.ClubId != null)
+                        {
+                            var club = await db.Clubs.FindAsync(updatePlayerDto.ClubId);
+                            if (club is null)
+                                return TypedResults.NotFound($"No club found with id {updatePlayerDto.ClubId}.");
+                        }
                         updatePlayerDto.Adapt(player);
                         await db.SaveChangesAsync();
                         return Results.NoContent();

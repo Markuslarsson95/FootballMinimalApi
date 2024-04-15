@@ -12,8 +12,8 @@ using WebApp;
 namespace WebApp.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
-    [Migration("20240415162632_initial")]
-    partial class initial
+    [Migration("20240415183059_initial-create")]
+    partial class initialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
