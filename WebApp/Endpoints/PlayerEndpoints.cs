@@ -1,13 +1,14 @@
-﻿using Mapster;
+﻿using Carter;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using WebApp.DTOs.Player;
 using WebApp.Models;
 
 namespace WebApp.Endpoints
 {
-    public static class PlayerEndpoints
+    public class PlayerEndpoints : ICarterModule
     {
-        public static void RegisterPlayerEndpoints(this WebApplication app)
+        public void AddRoutes(IEndpointRouteBuilder app)
         {
             var players = app.MapGroup("/players");
 
@@ -16,131 +17,131 @@ namespace WebApp.Endpoints
             players.MapPost("/", CreatePayer);
             players.MapPut("/{id}", UpdatePlayer);
             players.MapDelete("/{id}", RemovePlayer);
+        }
 
-            static async Task<IResult> GetAllPlayers(FootballDbContext db)
+        public static async Task<IResult> GetAllPlayers(FootballDbContext db)
+        {
+            try
             {
-                try
-                {
-                    var players = await db.Players
-                        .Include(x => x.Club)
-                        .ToListAsync();
-
-                    var playerDto = players.Adapt<List<PlayerResponseDto>>();
-
-                    return TypedResults.Ok(playerDto);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
-            static async Task<IResult> GetPlayerById(int id, FootballDbContext db)
-            {
-                try
-                {
-                    var player = await db.Players
-                    .Where(x => x.Id == id)
+                var players = await db.Players
                     .Include(x => x.Club)
-                    .FirstOrDefaultAsync();
+                    .ToListAsync();
 
-                    if (player == null)
-                        return TypedResults.NotFound($"No Player found with id {id}");
-                    var playerDtoResponse = player.Adapt<PlayerResponseDto>();
+                var playerDto = players.Adapt<List<PlayerResponseDto>>();
 
-                    return playerDtoResponse
-                    is PlayerResponseDto playerDto
-                    ? TypedResults.Ok(playerDtoResponse)
-                    : TypedResults.BadRequest();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-                }
+                return TypedResults.Ok(playerDto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
+                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        public static async Task<IResult> GetPlayerById(int id, FootballDbContext db)
+        {
+            try
+            {
+                var player = await db.Players
+                .Where(x => x.Id == id)
+                .Include(x => x.Club)
+                .FirstOrDefaultAsync();
+
+                if (player == null)
+                    return TypedResults.NotFound($"No Player found with id {id}");
+                var playerDtoResponse = player.Adapt<PlayerResponseDto>();
+
+                return playerDtoResponse
+                is PlayerResponseDto playerDto
+                ? TypedResults.Ok(playerDtoResponse)
+                : TypedResults.BadRequest();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
+                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        public static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, FootballDbContext db)
+        {
+
+            if (createPlayerDto.ClubId != null)
+            {
+                var club = await db.Clubs.FindAsync(createPlayerDto.ClubId);
+                if (club is null)
+                    return TypedResults.NotFound($"No club found with id {createPlayerDto.ClubId}.");
             }
 
-            static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, FootballDbContext db)
+            var player = new Player
             {
+                FirstName = createPlayerDto.FirstName,
+                LastName = createPlayerDto.LastnName,
+                ClubId = createPlayerDto.ClubId,
+                Position = createPlayerDto.Position,
+                Nationality = createPlayerDto.Nationality,
+                DateOfBirth = createPlayerDto.DateOfBirth,
+                KitNumber = createPlayerDto.KitNumber,
+                Height = createPlayerDto.Height
+            };
+            try
+            {
+                db.Players.Add(player);
+                await db.SaveChangesAsync();
+                return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponseDto>());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
+                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
-                if (createPlayerDto.ClubId != null)
-                {
-                    var club = await db.Clubs.FindAsync(createPlayerDto.ClubId);
-                    if (club is null)
-                        return TypedResults.NotFound($"No club found with id {createPlayerDto.ClubId}.");
-                }
+        public static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, FootballDbContext db)
+        {
+            try
+            {
+                var player = await db.Players.FindAsync(id);
 
-                var player = new Player
+                if (player is Player)
                 {
-                    FirstName = createPlayerDto.FirstName,
-                    LastName = createPlayerDto.LastnName,
-                    ClubId = createPlayerDto.ClubId,
-                    Position = createPlayerDto.Position,
-                    Nationality = createPlayerDto.Nationality,
-                    DateOfBirth = createPlayerDto.DateOfBirth,
-                    KitNumber = createPlayerDto.KitNumber,
-                    Height = createPlayerDto.Height
-                };
-                try
-                {
-                    db.Players.Add(player);
+                    if (updatePlayerDto.ClubId != null)
+                    {
+                        var club = await db.Clubs.FindAsync(updatePlayerDto.ClubId);
+                        if (club is null)
+                            return TypedResults.NotFound($"No club found with id {updatePlayerDto.ClubId}.");
+                    }
+                    updatePlayerDto.Adapt(player);
                     await db.SaveChangesAsync();
-                    return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponseDto>());
+                    return Results.NoContent();
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-                }
+                return Results.NotFound($"No Player found with id {id}");
             }
-
-            static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, FootballDbContext db)
+            catch (Exception ex)
             {
-                try
-                {
-                    var player = await db.Players.FindAsync(id);
-
-                    if (player is Player)
-                    {
-                        if (updatePlayerDto.ClubId != null)
-                        {
-                            var club = await db.Clubs.FindAsync(updatePlayerDto.ClubId);
-                            if (club is null)
-                                return TypedResults.NotFound($"No club found with id {updatePlayerDto.ClubId}.");
-                        }
-                        updatePlayerDto.Adapt(player);
-                        await db.SaveChangesAsync();
-                        return Results.NoContent();
-                    }
-                    return Results.NotFound($"No Player found with id {id}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-                }
+                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
+                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
 
-            static async Task<IResult> RemovePlayer(int id, FootballDbContext db)
+        public static async Task<IResult> RemovePlayer(int id, FootballDbContext db)
+        {
+            try
             {
-                try
-                {
-                    var player = await db.Players.FindAsync(id);
+                var player = await db.Players.FindAsync(id);
 
-                    if (player is Player)
-                    {
-                        db.Players.Remove(player);
-                        await db.SaveChangesAsync();
-                        return Results.NoContent();
-                    }
-                    return Results.NotFound($"No Player found with id {id}");
-                }
-                catch (Exception ex)
+                if (player is Player)
                 {
-                    Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                    return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
+                    db.Players.Remove(player);
+                    await db.SaveChangesAsync();
+                    return Results.NoContent();
                 }
+                return Results.NotFound($"No Player found with id {id}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
+                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
     }

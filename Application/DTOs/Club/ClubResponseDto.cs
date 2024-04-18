@@ -2,9 +2,9 @@
 
 namespace WebApp.DTOs.Club
 {
-    public record ClubResponseDto(int Id, 
-        string Name, 
-        string Stadium, 
+    public record ClubResponseDto(int Id,
+        string Name,
+        string Stadium,
         int LeaguePoints,
         int MatchesPlayed,
         int Wins,

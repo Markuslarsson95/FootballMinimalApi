@@ -1,12 +1,16 @@
+using Application;
+using Carter;
+using Infrastructure;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
-using WebApp;
-using WebApp.Endpoints;
 using WebApp.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.Services.AddDbContext<FootballDbContext>(opt => opt.UseSqlServer("Server = (localdb)\\MSSQLLocalDB; Database = Football; Integrated Security = true"));
-builder.Services.AddDbContext<FootballDbContext>(opt => opt.UseSqlServer("Server=(local)\\SQLEXPRESS;Database=Football;Trusted_Connection=True;TrustServerCertificate=true"));
+
+builder.Services
+    .AddInfrastructure()
+    .AddApplication();
+
+builder.Services.AddCarter();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -28,8 +32,6 @@ if (app.Environment.IsDevelopment())
 }
 
 // Register Endpoints
-app.RegisterStadiumEndpoints();
-app.RegisterPlayerEndpoints();
-app.RegisterClubEndpoints();
+app.MapCarter();
 
 app.Run();

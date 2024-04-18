@@ -2,7 +2,7 @@
 {
     public record UpdateClubDto(
         int? StadiumId,
-        string Name, 
+        string Name,
         int LeaguePoints,
         int MatchesPlayed,
         int Wins,
