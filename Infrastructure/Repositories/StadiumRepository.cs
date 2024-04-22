@@ -13,37 +13,35 @@ namespace Infrastructure.Repositories
         {
             _context = context;
         }
-        public Stadium AddStadium(Stadium stadium)
+        public Stadium Add(Stadium stadium)
         {
             return _context.Stadiums.Add(stadium).Entity;
         }
 
-        public async Task<IEnumerable<Stadium>> GetAllStadiums()
+        public async Task<IEnumerable<Stadium>> GetAll()
         {
-            var stadiums = await _context.Stadiums.Include(x => x.Club).ToListAsync();
-
-            return stadiums;
+            return await _context.Stadiums.Include(x => x.Club).ToListAsync();
         }
 
-        public async Task<Stadium> GetStadiumById(int stadiumId)
+        public async Task<Stadium> GetById(int id)
         {
-            var stadium = await _context.Stadiums.Include(x => x.Club).FirstOrDefaultAsync(x => x.Id == stadiumId);
-            return stadium;
+            return await _context.Stadiums.Include(x => x.Club).FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Task<Stadium> RemoveStadium(int stadiumId)
+        public Task Remove(Stadium stadium)
         {
             throw new NotImplementedException();
         }
 
-        public async void Save()
+        public async Task Save()
         {
             await _context.SaveChangesAsync();
         }
 
-        public Task<Stadium> UpdateStadium(int stadiumId)
+        public async Task Update(Stadium stadium)
         {
-            throw new NotImplementedException();
+            _context.Stadiums.Update(stadium);
+            await _context.SaveChangesAsync();
         }
     }
 }

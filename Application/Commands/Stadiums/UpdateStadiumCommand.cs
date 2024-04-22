@@ -1,16 +1,41 @@
-﻿using MediatR;
+﻿using Application.Interfaces;
+using Mapster;
+using MediatR;
+using System.Net;
 using WebApp.DTOs.Stadium;
+using WebApp.Exceptions;
 
 namespace Application.Commands.Stadiums
 {
-    public record UpdateStadiumCommand : IRequest<StadiumResponseDto>
+    public static class UpdateStadiumCommand
     {
-        public UpdateStadiumCommand(int id, UpdateStadiumDto updateDto)
+        public record Command(int id, UpdateStadiumDto dto) : IRequest<StadiumResponseDto>;
+
+        public class Handler : IRequestHandler<Command, StadiumResponseDto>
         {
-            Id = id;
-            UpdateDto = updateDto;
+            private readonly IStadiumRepository _stadiumRepository;
+
+            public Handler(IStadiumRepository stadiumRepository)
+            {
+                _stadiumRepository = stadiumRepository;
+            }
+
+            public async Task<StadiumResponseDto> Handle(Command request, CancellationToken cancellationToken)
+            {
+                var stadium = await _stadiumRepository.GetById(request.id);
+                if (stadium == null)
+                    throw new CommandQueryMessageException($"Can't find stadium with id {request.id}", (int)HttpStatusCode.NotFound);
+                
+                stadium.Name = request.dto.Name;
+                stadium.Location = request.dto.Location;
+                stadium.Capacity = request.dto.Capacity;
+                stadium.YearBuilt = request.dto.YearBuilt;
+                stadium.Adress = request.dto.Adress;
+
+                await _stadiumRepository.Update(stadium);
+
+                return stadium.Adapt<StadiumResponseDto>();
+            }
         }
-        public int Id { get; }
-        public UpdateStadiumDto UpdateDto { get; }        
     }
 }

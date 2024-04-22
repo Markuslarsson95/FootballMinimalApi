@@ -4,11 +4,11 @@ namespace Application.Interfaces
 {
     public interface IStadiumRepository
     {
-        Task<IEnumerable<Stadium>> GetAllStadiums();
-        Task<Stadium> GetStadiumById(int stadiumId);
-        Stadium AddStadium(Stadium stadium);
-        Task<Stadium> UpdateStadium(int stadiumId);
-        Task<Stadium> RemoveStadium(int stadiumId);
-        void Save();
+        Task<IEnumerable<Stadium>> GetAll();
+        Task<Stadium> GetById(int id);
+        Stadium Add(Stadium stadium);
+        Task Update(Stadium stadium);
+        Task Remove(Stadium stadium);
+        Task Save();
     }
 }

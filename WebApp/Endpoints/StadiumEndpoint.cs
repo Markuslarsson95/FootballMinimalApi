@@ -31,28 +31,20 @@ namespace WebApp.Endpoints
 
         public static async Task<Results<Ok<StadiumResponseDto>, NotFound, StatusCodeHttpResult>> GetStadiumById(int id, ISender sender)
         {
-            var stadium = await sender.Send(new GetStadiumByIdQuery(id));
+            var stadium = await sender.Send(new GetStadiumByIdQuery.Query(id));
             return TypedResults.Ok(stadium);
         }
 
-        public static async Task<IResult> CreateStadium([FromBody] CreateStadiumDto newStadium, ISender sender)
+        public static async Task<IResult> CreateStadium([FromBody] CreateStadiumDto dto, ISender sender)
         {
-            var stadium = await sender.Send(new AddStdiumCommand(newStadium));
+            var stadium = await sender.Send(new AddStdiumCommand.Command(dto));
             return TypedResults.Created($"/stadiums/{stadium}", stadium);
         }
 
-        public static async Task<IResult> UpdateStadium(int id, [FromBody] UpdateStadiumCommand updateStadium, UpdateStadiumDto updateStadiumDto, FootballDbContext db)
+        public static async Task<IResult> UpdateStadium(int id, [FromBody] UpdateStadiumDto dto, ISender sender)
         {
-            var stadium = await db.Stadiums.FindAsync(id);
-
-            if (stadium is Stadium)
-            {
-                updateStadiumDto.Adapt(stadium);
-                await db.SaveChangesAsync();
-
-                return Results.NoContent();
-            }
-            return Results.NotFound($"No Stadium found with id {id}");
+            await sender.Send(new UpdateStadiumCommand.Command(id, dto));
+            return Results.NoContent();
         }
 
         public static async Task<IResult> RemoveStadium(int id, FootballDbContext db)
