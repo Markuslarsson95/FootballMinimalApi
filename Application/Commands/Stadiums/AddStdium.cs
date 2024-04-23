@@ -4,7 +4,7 @@ using WebApp.DTOs.Stadium;
 
 namespace Application.Commands.Stadiums
 {
-    public static class AddStdiumCommand
+    public static class AddStdium
     {
         public record Command(CreateStadiumDto dto) : IRequest<int>;
 
@@ -27,7 +27,6 @@ namespace Application.Commands.Stadiums
                     YearBuilt = request.dto.YearBuilt
                 };
                 _stadiumRepository.Add(stadium);
-                await _stadiumRepository.Save();
 
                 return stadium.Id;
             }

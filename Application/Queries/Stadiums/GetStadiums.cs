@@ -5,7 +5,7 @@ using WebApp.DTOs.Stadium;
 
 namespace Application.Queries.Stadium
 {
-    public static class GetStadiumsQuery
+    public static class GetStadiums
     {
         public record Query() : IRequest<IEnumerable<StadiumResponseDto>>;
 

@@ -7,7 +7,7 @@ using WebApp.Exceptions;
 
 namespace Application.Queries.Stadium
 {
-    public static class GetStadiumByIdQuery
+    public static class GetStadiumById
     {
         public record Query(int Id) : IRequest<StadiumResponseDto>;
 
