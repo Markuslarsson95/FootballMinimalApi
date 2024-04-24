@@ -4,7 +4,19 @@ using Infrastructure;
 using Mapster;
 using WebApp.Mappings;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                      });
+});
 
 builder.Services
     .AddInfrastructure()
@@ -30,6 +42,8 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
+
+app.UseCors(MyAllowSpecificOrigins);
 
 // Register Endpoints
 app.MapCarter();
