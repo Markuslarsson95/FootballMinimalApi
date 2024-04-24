@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Stadium;
+using WebApp.Models;
 
 namespace Application.Commands.Stadiums
 {
@@ -18,7 +19,7 @@ namespace Application.Commands.Stadiums
             }
             public async Task<int> Handle(Command request, CancellationToken cancellationToken)
             {
-                var stadium = new WebApp.Models.Stadium
+                var stadium = new Stadium
                 {
                     Name = request.dto.Name,
                     Location = request.dto.Location,
@@ -26,7 +27,7 @@ namespace Application.Commands.Stadiums
                     Capacity = request.dto.Capacity,
                     YearBuilt = request.dto.YearBuilt
                 };
-                _stadiumRepository.Add(stadium);
+                await _stadiumRepository.Add(stadium);
 
                 return stadium.Id;
             }

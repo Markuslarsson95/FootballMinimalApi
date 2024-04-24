@@ -32,7 +32,7 @@ namespace Application.Commands.Stadiums
                 stadium.YearBuilt = request.dto.YearBuilt;
                 stadium.Adress = request.dto.Adress;
 
-                _stadiumRepository.Update(stadium);
+                await _stadiumRepository.Update(stadium);
 
                 return stadium.Adapt<StadiumResponseDto>();
             }

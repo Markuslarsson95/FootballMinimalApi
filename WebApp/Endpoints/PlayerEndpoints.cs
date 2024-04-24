@@ -1,8 +1,9 @@
-﻿using Carter;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Commands.Players;
+using Application.Queries.Players;
+using Carter;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using WebApp.DTOs.Player;
-using WebApp.Models;
 
 namespace WebApp.Endpoints
 {
@@ -19,130 +20,34 @@ namespace WebApp.Endpoints
             players.MapDelete("/{id}", RemovePlayer);
         }
 
-        public static async Task<IResult> GetAllPlayers(FootballDbContext db)
+        public static async Task<IResult> GetAllPlayers(ISender sender)
         {
-            try
-            {
-                var players = await db.Players
-                    .Include(x => x.Club)
-                    .ToListAsync();
-
-                var playerDto = players.Adapt<List<PlayerResponseDto>>();
-
-                return TypedResults.Ok(playerDto);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            var players = await sender.Send(new GetPlayers.Query());
+            return TypedResults.Ok(players);
         }
 
-        public static async Task<IResult> GetPlayerById(int id, FootballDbContext db)
+        public static async Task<IResult> GetPlayerById(int id, ISender sender)
         {
-            try
-            {
-                var player = await db.Players
-                .Where(x => x.Id == id)
-                .Include(x => x.Club)
-                .FirstOrDefaultAsync();
-
-                if (player == null)
-                    return TypedResults.NotFound($"No Player found with id {id}");
-                var playerDtoResponse = player.Adapt<PlayerResponseDto>();
-
-                return playerDtoResponse
-                is PlayerResponseDto playerDto
-                ? TypedResults.Ok(playerDtoResponse)
-                : TypedResults.BadRequest();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            var player = await sender.Send(new GetPlayerById.Query(id));
+            return TypedResults.Ok(player);
         }
 
-        public static async Task<IResult> CreatePayer(CreatePlayerDto createPlayerDto, FootballDbContext db)
+        public static async Task<IResult> CreatePayer([FromBody] CreatePlayerDto dto, ISender sender)
         {
-
-            if (createPlayerDto.ClubId != null)
-            {
-                var club = await db.Clubs.FindAsync(createPlayerDto.ClubId);
-                if (club is null)
-                    return TypedResults.NotFound($"No club found with id {createPlayerDto.ClubId}.");
-            }
-
-            var player = new Player
-            {
-                FirstName = createPlayerDto.FirstName,
-                LastName = createPlayerDto.LastnName,
-                ClubId = createPlayerDto.ClubId,
-                Position = createPlayerDto.Position,
-                Nationality = createPlayerDto.Nationality,
-                DateOfBirth = createPlayerDto.DateOfBirth,
-                KitNumber = createPlayerDto.KitNumber,
-                Height = createPlayerDto.Height
-            };
-            try
-            {
-                db.Players.Add(player);
-                await db.SaveChangesAsync();
-                return TypedResults.Created($"/players/{player.Id}", player.Adapt<PlayerResponseDto>());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            var newPlayer = await sender.Send(new AddPlayer.Command(dto));
+            return TypedResults.Created($"/players/{newPlayer}", newPlayer);
         }
 
-        public static async Task<IResult> UpdatePlayer(int id, UpdatePlayerDto updatePlayerDto, FootballDbContext db)
+        public static async Task<IResult> UpdatePlayer(int id, [FromBody] UpdatePlayerDto dto, ISender sender)
         {
-            try
-            {
-                var player = await db.Players.FindAsync(id);
-
-                if (player is Player)
-                {
-                    if (updatePlayerDto.ClubId != null)
-                    {
-                        var club = await db.Clubs.FindAsync(updatePlayerDto.ClubId);
-                        if (club is null)
-                            return TypedResults.NotFound($"No club found with id {updatePlayerDto.ClubId}.");
-                    }
-                    updatePlayerDto.Adapt(player);
-                    await db.SaveChangesAsync();
-                    return Results.NoContent();
-                }
-                return Results.NotFound($"No Player found with id {id}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            await sender.Send(new UpdatePlayer.Command(id, dto));
+            return TypedResults.NoContent();
         }
 
-        public static async Task<IResult> RemovePlayer(int id, FootballDbContext db)
+        public static async Task<IResult> RemovePlayer(int id, ISender sender)
         {
-            try
-            {
-                var player = await db.Players.FindAsync(id);
-
-                if (player is Player)
-                {
-                    db.Players.Remove(player);
-                    await db.SaveChangesAsync();
-                    return Results.NoContent();
-                }
-                return Results.NotFound($"No Player found with id {id}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while retrieving players: {ex.Message}");
-                return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            await sender.Send(new DeletePlayer.Command(id));
+            return TypedResults.NoContent();
         }
     }
 }

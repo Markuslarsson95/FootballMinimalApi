@@ -16,11 +16,4 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\Clubs\" />
-    <Folder Include="Commands\Players\" />
-    <Folder Include="Queries\Clubs\" />
-    <Folder Include="Queries\Players\" />
-  </ItemGroup>
-
 </Project>

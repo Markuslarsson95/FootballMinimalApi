@@ -1,33 +1,53 @@
 ﻿using Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using WebApp;
 using WebApp.Models;
 
 namespace Infrastructure.Repositories
 {
     public class ClubRepository : IClubRepository
     {
-        public Task<Club> AddClub(Club club)
+        private readonly FootballDbContext _context;
+
+        public ClubRepository(FootballDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public IEnumerable<Club> GetAllClubs()
+        public async Task<IEnumerable<Club>> GetAll()
         {
-            throw new NotImplementedException();
+            return await _context.Clubs
+                .Include(x => x.Stadium)
+                .Include(x => x.Players)
+                .ToListAsync();
         }
 
-        public Task<Club> GetClubById(int clubId)
+        public async Task<Club?> GetById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Clubs
+                .Include(x => x.Stadium)
+                .Include(x => x.Players)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Task<Club> RemoveClub(int clubId)
+        public async Task<Club> Add(Club club)
         {
-            throw new NotImplementedException();
+            var newClub = _context.Clubs.Add(club).Entity;
+            await _context.SaveChangesAsync();
+            return newClub;
         }
 
-        public Task<Club> UpdateClub(int clubId, Club club)
+        public async Task<Club> Update(Club club)
         {
-            throw new NotImplementedException();
+            var updatedClub = _context.Clubs.Update(club).Entity;
+            await _context.SaveChangesAsync();
+            return updatedClub;
+        }
+
+        public void Remove(Club club)
+        {
+            _context.Clubs.Remove(club);
+            _context.SaveChanges();
         }
     }
 }

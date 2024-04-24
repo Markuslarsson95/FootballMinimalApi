@@ -1,6 +1,4 @@
-﻿using WebApp.DTOs.Player;
-
-namespace WebApp.DTOs.Club
+﻿namespace WebApp.DTOs.Club
 {
     public record ClubResponseDto(int Id,
         string Name,
@@ -14,5 +12,5 @@ namespace WebApp.DTOs.Club
         int GoalsConceded,
         int CleanSheets,
         int YearFounded,
-        List<PlayerResponseDto> Players);
+        List<string> Players);
 }

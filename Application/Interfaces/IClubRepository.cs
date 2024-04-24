@@ -4,10 +4,10 @@ namespace Application.Interfaces
 {
     public interface IClubRepository
     {
-        IEnumerable<Club> GetAllClubs();
-        Task<Club> GetClubById(int clubId);
-        Task<Club> AddClub(Club club);
-        Task<Club> UpdateClub(int clubId, Club club);
-        Task<Club> RemoveClub(int clubId);
+        Task<IEnumerable<Club>> GetAll();
+        Task<Club?> GetById(int id);
+        Task<Club> Add(Club club);
+        Task<Club> Update(Club club);
+        void Remove(Club club);
     }
 }

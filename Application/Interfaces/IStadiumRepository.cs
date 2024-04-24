@@ -6,8 +6,8 @@ namespace Application.Interfaces
     {
         Task<IEnumerable<Stadium>> GetAll();
         Task<Stadium?> GetById(int id);
-        Stadium Add(Stadium stadium);
-        Stadium Update(Stadium stadium);
+        Task<Stadium> Add(Stadium stadium);
+        Task<Stadium> Update(Stadium stadium);
         void Remove(Stadium stadium);
     }
 }

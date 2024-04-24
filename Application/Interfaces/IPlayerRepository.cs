@@ -4,10 +4,10 @@ namespace Application.Interfaces
 {
     public interface IPlayerRepository
     {
-        IEnumerable<Player> GetAllPlayers();
-        Task<Player> GetPlayerById(int playerId);
-        Task<Player> AddPlayer(Player player);
-        Task<Player> UpdatePlayer(int playerId, Player player);
-        Task<Player> RemovePlayer(int playerId);
+        Task<IEnumerable<Player>> GetAll();
+        Task<Player?> GetById(int id);
+        Task<Player> Add(Player player);
+        Task<Player> Update(Player player);
+        void Remove(Player player);
     }
 }

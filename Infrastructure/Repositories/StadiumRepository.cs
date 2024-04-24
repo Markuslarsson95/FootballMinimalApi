@@ -13,7 +13,7 @@ namespace Infrastructure.Repositories
         {
             _context = context;
         }
-        
+
         public async Task<IEnumerable<Stadium>> GetAll()
         {
             return await _context.Stadiums
@@ -28,17 +28,17 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Stadium Add(Stadium stadium)
+        public async Task<Stadium> Add(Stadium stadium)
         {
             var newStadium = _context.Stadiums.Add(stadium).Entity;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return newStadium;
         }
 
-        public Stadium Update(Stadium stadium)
+        public async Task<Stadium> Update(Stadium stadium)
         {
             var updatedStadium = _context.Stadiums.Update(stadium).Entity;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return updatedStadium;
         }
 

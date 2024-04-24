@@ -1,7 +1,6 @@
 ﻿using Application.Commands.Stadiums;
 using Application.Queries.Stadium;
 using Carter;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.DTOs.Stadium;
@@ -23,7 +22,7 @@ namespace WebApp.Endpoints
         public static async Task<IResult> GetAllStadiums(ISender sender)
         {
             var stadiums = await sender.Send(new GetStadiums.Query());
-            return TypedResults.Ok(stadiums.Adapt<List<StadiumResponseDto>>());
+            return TypedResults.Ok(stadiums);
         }
 
         public static async Task<IResult> GetStadiumById(int id, ISender sender)

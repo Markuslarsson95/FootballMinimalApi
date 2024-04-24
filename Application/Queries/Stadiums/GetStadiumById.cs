@@ -22,11 +22,11 @@ namespace Application.Queries.Stadium
 
             public async Task<StadiumResponseDto> Handle(Query request, CancellationToken cancellationToken)
             {
-                var response = await _stadiumRepository.GetById(request.Id);
-                if (response is null)
+                var stadium = await _stadiumRepository.GetById(request.Id);
+                if (stadium is null)
                     throw new CommandQueryMessageException($"Can't find Stadium with id {request.Id}.", (int)HttpStatusCode.NotFound);
 
-                return response.Adapt<StadiumResponseDto>();
+                return stadium.Adapt<StadiumResponseDto>();
             }
         }
     }

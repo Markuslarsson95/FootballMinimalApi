@@ -20,9 +20,9 @@ namespace Application.Queries.Stadium
 
             public async Task<IEnumerable<StadiumResponseDto>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var response = await _stadiumRepository.GetAll();
+                var stadiums = await _stadiumRepository.GetAll();
 
-                return response.Adapt<IEnumerable<StadiumResponseDto>>();
+                return stadiums.Adapt<IEnumerable<StadiumResponseDto>>();
             }
         }
     }
