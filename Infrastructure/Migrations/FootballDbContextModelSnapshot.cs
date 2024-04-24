@@ -8,7 +8,7 @@ using WebApp;
 
 #nullable disable
 
-namespace WebApp.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
     partial class FootballDbContextModelSnapshot : ModelSnapshot

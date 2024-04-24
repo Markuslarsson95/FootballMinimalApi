@@ -9,10 +9,10 @@ using WebApp;
 
 #nullable disable
 
-namespace WebApp.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
-    [Migration("20240415183059_initial-create")]
+    [Migration("20240416093935_initial-create")]
     partial class initialcreate
     {
         /// <inheritdoc />

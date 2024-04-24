@@ -13,7 +13,8 @@ namespace WebApp.Mappings
             // Configure Club to ClubResponseDto
             TypeAdapterConfig<Club, ClubResponseDto>.NewConfig()
                 .Map(dest => dest.Stadium, src => src.Stadium.Name)
-                .Map(dest => dest.Players, src => src.Players.Adapt<List<PlayerResponseDto>>());
+                .Map(dest => dest.Players, src => src.Players.Select(player => $"{player.FirstName} {player.LastName}").ToList());
+
 
             // Configure Player to PlayerResponseDto
             TypeAdapterConfig<Player, PlayerResponseDto>.NewConfig()
