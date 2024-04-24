@@ -43,6 +43,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// UseCors needs to be after routing but before Authorization
 app.UseCors(MyAllowSpecificOrigins);
 
 // Register Endpoints

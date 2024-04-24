@@ -7,15 +7,27 @@ import ClubComponent from "./components/Club";
 function App() {
   useState(false);
   const [alertVisible, setAlertVisibility] = useState(false);
+  const [showClubComponent, setShowClubComponent] = useState(false);
   return (
     <div>
       {alertVisible && (
-        <Alert onClose={() => setAlertVisibility(false)}>
+        <Alert
+          onClose={() => {
+            setAlertVisibility(false);
+            setShowClubComponent(false);
+          }}
+        >
           <span>My alert</span>
         </Alert>
       )}
-      <ClubComponent></ClubComponent>
-      <Button color="primary" onClick={() => setAlertVisibility(true)}>
+      {showClubComponent && <ClubComponent />}
+      <Button
+        color="primary"
+        onClick={() => {
+          setAlertVisibility(true);
+          setShowClubComponent(true);
+        }}
+      >
         My button
       </Button>
     </div>

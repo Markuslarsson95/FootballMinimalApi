@@ -8,7 +8,6 @@ function ClubComponent() {
     const { data } = await axios.get("https://localhost:7154/clubs");
     const clubs = data;
     setClubs(clubs);
-    console.log(clubs);
   };
 
   useEffect(() => {
@@ -18,11 +17,17 @@ function ClubComponent() {
   return (
     <>
       <h1>Clubs</h1>
-      <ul className="list-group">
+      <div className="list-group">
         {clubs.map((club) => (
-          <li key={club.id}>{club.name}</li>
+          <a
+            href="#"
+            className="list-group-item list-group-item-action"
+            key={club.id}
+          >
+            {club.name}
+          </a>
         ))}
-      </ul>
+      </div>
     </>
   );
 }
