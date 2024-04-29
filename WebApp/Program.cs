@@ -3,6 +3,7 @@ using Carter;
 using Infrastructure;
 using Mapster;
 using WebApp.Mappings;
+using WebApp.Middleware;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Register Endpoints
 app.MapCarter();
