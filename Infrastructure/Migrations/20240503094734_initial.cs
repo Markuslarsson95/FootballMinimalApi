@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initialcreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -99,7 +100,7 @@ namespace Infrastructure.Migrations
                     { 10, "Stevenage Road, London, SW6 6HH", 24500, "London", "Craven Cottage", 1896 },
                     { 11, "Anfield, Anfield Road, Liverpool, L4 0TH", 61276, "Liverpool", "Anfield", 1884 },
                     { 12, "Kenilworth Road Stadium, 1 Maple Road, Luton, LU4 8AW", 10265, "Luton", "Kenilworth Road", 1905 },
-                    { 13, "Etihad Stadium, Etihad Campus, Manchester, M11 3FF", 53400, "Manchester", "Etihad Stadium,", 2002 },
+                    { 13, "Etihad Stadium, Etihad Campus, Manchester, M11 3FF", 53400, "Manchester", "Etihad Stadium", 2002 },
                     { 14, "Sir Matt Busby Way, Old Trafford, Manchester, M16 0RA", 74310, "Manchester", "Old Trafford", 1909 },
                     { 15, "St. James' Park, Newcastle Upon Tyne, NE1 4ST", 52305, "Newcastle", "St. James' Park", 1892 },
                     { 16, "Nottingham Forest Football Club, The City Ground, Pavilion Road, West Bridgford, Nottingham, NG2 5FJ", 30404, "Nottingham", "The City Ground", 1898 },

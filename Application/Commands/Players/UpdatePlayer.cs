@@ -26,7 +26,7 @@ namespace Application.Commands.Players
                     throw new CommandQueryMessageException($"Can't find Player with id {request.id}", (int)HttpStatusCode.NotFound);
 
                 player.FirstName = request.dto.FirstName;
-                player.LastName = request.dto.LastnName;
+                player.LastName = request.dto.LastName;
                 player.ClubId = request.dto.ClubId;
                 player.Position = request.dto.Position;
                 player.Nationality = request.dto.Nationality;
