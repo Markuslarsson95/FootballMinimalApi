@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using System.Net;
 using WebApp.DTOs.Club;
@@ -8,7 +9,7 @@ namespace Application.Commands.Clubs
 {
     public static class UpdateClub
     {
-        public record Command(int id, UpdateClubDto dto) : IRequest;
+        public record Command(int id, UpdateClubDto dto) : ICommand;
 
         public class Handler : IRequestHandler<Command>
         {

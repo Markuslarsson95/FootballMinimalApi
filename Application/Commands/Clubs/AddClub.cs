@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Club;
 using WebApp.Models;
@@ -7,7 +8,7 @@ namespace Application.Commands.Clubs
 {
     public static class AddClub
     {
-        public record Command(CreateClubDto dto) : IRequest<int>;
+        public record Command(CreateClubDto dto) : ICommand<int>;
 
         public class Handler : IRequestHandler<Command, int>
         {

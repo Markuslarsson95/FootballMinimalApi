@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using System.Net;
 using WebApp.DTOs.Player;
@@ -8,7 +9,7 @@ namespace Application.Commands.Players
 {
     public static class UpdatePlayer
     {
-        public record Command(int id, UpdatePlayerDto dto) : IRequest;
+        public record Command(int id, UpdatePlayerDto dto) : ICommand;
 
         public class Handler : IRequestHandler<Command>
         {
