@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using Mapster;
 using MediatR;
 using System.Net;
@@ -9,7 +10,7 @@ namespace Application.Commands.Stadiums
 {
     public static class UpdateStadium
     {
-        public record Command(int id, UpdateStadiumDto dto) : IRequest<StadiumResponseDto>;
+        public record Command(int id, UpdateStadiumDto dto) : ICommand<StadiumResponseDto>;
 
         public class Handler : IRequestHandler<Command, StadiumResponseDto>
         {
@@ -30,7 +31,7 @@ namespace Application.Commands.Stadiums
                 stadium.Location = request.dto.Location;
                 stadium.Capacity = request.dto.Capacity;
                 stadium.YearBuilt = request.dto.YearBuilt;
-                stadium.Adress = request.dto.Adress;
+                stadium.Adress = request.dto.Address;
 
                 await _stadiumRepository.Update(stadium);
 

@@ -4,5 +4,5 @@
         string Location,
         int Capacity,
         int YearBuilt,
-        string Adress);
+        string Address);
 }

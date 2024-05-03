@@ -11,5 +11,5 @@
         int GoalsConceded,
         int CleanSheets,
         int YearFounded,
-        int? StadiumId);
+        int StadiumId);
 }

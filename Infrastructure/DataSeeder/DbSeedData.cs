@@ -120,7 +120,7 @@ namespace WebApp.DataSeeder
                 new Stadium
                 {
                     Id = 13,
-                    Name = "Etihad Stadium,",
+                    Name = "Etihad Stadium",
                     Location = "Manchester",
                     Capacity = 53400,
                     YearBuilt = 2002,

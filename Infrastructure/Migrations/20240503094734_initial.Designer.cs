@@ -12,8 +12,8 @@ using WebApp;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(FootballDbContext))]
-    [Migration("20240416093935_initial-create")]
-    partial class initialcreate
+    [Migration("20240503094734_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -566,7 +566,7 @@ namespace Infrastructure.Migrations
                             Adress = "Etihad Stadium, Etihad Campus, Manchester, M11 3FF",
                             Capacity = 53400,
                             Location = "Manchester",
-                            Name = "Etihad Stadium,",
+                            Name = "Etihad Stadium",
                             YearBuilt = 2002
                         },
                         new

@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Stadium;
 using WebApp.Models;
@@ -7,7 +8,7 @@ namespace Application.Commands.Stadiums
 {
     public static class AddStdium
     {
-        public record Command(CreateStadiumDto dto) : IRequest<int>;
+        public record Command(CreateStadiumDto dto) : ICommand<int>;
 
         public class Handler : IRequestHandler<Command, int>
         {
@@ -23,7 +24,7 @@ namespace Application.Commands.Stadiums
                 {
                     Name = request.dto.Name,
                     Location = request.dto.Location,
-                    Adress = request.dto.Adress,
+                    Adress = request.dto.Address,
                     Capacity = request.dto.Capacity,
                     YearBuilt = request.dto.YearBuilt
                 };

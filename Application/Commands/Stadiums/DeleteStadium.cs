@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using System.Net;
 using WebApp.Exceptions;
@@ -7,7 +8,7 @@ namespace Application.Commands.Stadiums
 {
     public static class DeleteStadium
     {
-        public record Command(int id) : IRequest<string>;
+        public record Command(int id) : ICommand<string>;
 
         public class Handler : IRequestHandler<Command, string>
         {

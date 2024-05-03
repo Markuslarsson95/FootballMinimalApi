@@ -563,7 +563,7 @@ namespace Infrastructure.Migrations
                             Adress = "Etihad Stadium, Etihad Campus, Manchester, M11 3FF",
                             Capacity = 53400,
                             Location = "Manchester",
-                            Name = "Etihad Stadium,",
+                            Name = "Etihad Stadium",
                             YearBuilt = 2002
                         },
                         new

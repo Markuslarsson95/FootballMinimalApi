@@ -1,7 +1,6 @@
 ﻿namespace WebApp.DTOs.Club
 {
     public record UpdateClubDto(
-        int? StadiumId,
         string Name,
         int LeaguePoints,
         int MatchesPlayed,
@@ -11,5 +10,6 @@
         int Goals,
         int GoalsConceded,
         int CleanSheets,
-        int YearFounded);
+        int YearFounded,
+        int StadiumId);
 }

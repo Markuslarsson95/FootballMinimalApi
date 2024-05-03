@@ -2,8 +2,8 @@
 {
     public record CreatePlayerDto(
         string FirstName,
-        string LastnName,
-        int? ClubId,
+        string LastName,
+        int ClubId,
         string Position,
         string Nationality,
         DateOnly DateOfBirth,

@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using System.Net;
 using WebApp.Exceptions;
@@ -7,7 +8,7 @@ namespace Application.Commands.Clubs
 {
     public static class DeleteClub
     {
-        public record Command(int id) : IRequest;
+        public record Command(int id) : ICommand;
 
         public class Handler : IRequestHandler<Command>
         {

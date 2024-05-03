@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions.Messaging;
+using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Player;
 using WebApp.Models;
@@ -7,7 +8,7 @@ namespace Application.Commands.Players
 {
     public static class AddPlayer
     {
-        public record Command(CreatePlayerDto dto) : IRequest<int>;
+        public record Command(CreatePlayerDto dto) : ICommand<int>;
 
         public class Handler : IRequestHandler<Command, int>
         {
@@ -23,7 +24,7 @@ namespace Application.Commands.Players
                 var player = new Player
                 {
                     FirstName = request.dto.FirstName,
-                    LastName = request.dto.LastnName,
+                    LastName = request.dto.LastName,
                     ClubId = request.dto.ClubId,
                     Position = request.dto.Position,
                     Nationality = request.dto.Nationality,
