@@ -4,6 +4,7 @@ using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.DTOs.Club;
+using WebApp.Extensions;
 
 namespace WebApp.Endpoints
 {
@@ -28,8 +29,9 @@ namespace WebApp.Endpoints
 
         public static async Task<IResult> GetClubById(int id, ISender sender)
         {
-            var club = await sender.Send(new GetClubById.Query(id));
-            return TypedResults.Ok(club);
+            var result = await sender.Send(new GetClubById.Query(id));
+
+            return result.IsSuccess ? TypedResults.Ok(result) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> CreateClub([FromBody] CreateClubDto dto, ISender sender)
@@ -46,8 +48,9 @@ namespace WebApp.Endpoints
 
         public static async Task<IResult> RemoveClub(int id, ISender sender)
         {
-            await sender.Send(new DeleteClub.Command(id));
-            return TypedResults.NoContent();
+            var result = await sender.Send(new DeleteClub.Command(id));
+
+            return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
         }
     }
 }
