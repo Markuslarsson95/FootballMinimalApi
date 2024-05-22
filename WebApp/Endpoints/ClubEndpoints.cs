@@ -31,7 +31,7 @@ namespace WebApp.Endpoints
         {
             var result = await sender.Send(new GetClubById.Query(id));
 
-            return result.IsSuccess ? TypedResults.Ok(result) : result.ToProblemDetails();
+            return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> CreateClub([FromBody] CreateClubDto dto, ISender sender)

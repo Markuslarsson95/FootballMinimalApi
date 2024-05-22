@@ -4,7 +4,7 @@ namespace WebApp.Extensions
 {
     public static class ResultExtensions
     {
-        public static IResult ToProblemDetails(this Result result)
+        public static IResult ToProblemDetails<T>(this Result<T> result)
         {
             if(result.IsSuccess)
                 throw new InvalidOperationException();
