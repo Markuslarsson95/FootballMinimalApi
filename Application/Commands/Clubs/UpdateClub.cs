@@ -1,17 +1,18 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
 using Application.Interfaces;
+using Mapster;
 using MediatR;
-using System.Net;
 using WebApp.DTOs.Club;
-using WebApp.Exceptions;
 
 namespace Application.Commands.Clubs
 {
     public static class UpdateClub
     {
-        public record Command(int id, UpdateClubDto dto) : ICommand;
+        public record Command(int Id, UpdateClubDto Dto) : ICommand<Result<ClubResponseDto>>;
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<ClubResponseDto>>
         {
             private readonly IClubRepository _clubRepository;
 
@@ -20,25 +21,27 @@ namespace Application.Commands.Clubs
                 _clubRepository = clubRepository;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<ClubResponseDto>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var club = await _clubRepository.GetById(request.id);
+                var club = await _clubRepository.GetById(request.Id);
                 if (club is null)
-                    throw new CommandQueryMessageException($"Can't find Club with id {request.id}", (int)HttpStatusCode.NotFound);
+                    return Result<ClubResponseDto>.Failure(ClubErrors.NotFound(request.Id));
 
-                club.StadiumId = request.dto.StadiumId;
-                club.Name = request.dto.Name;
-                club.LeaguePoints = request.dto.LeaguePoints;
-                club.MatchesPlayed = request.dto.MatchesPlayed;
-                club.Wins = request.dto.Wins;
-                club.Losses = request.dto.Losses;
-                club.Drawns = request.dto.Draws;
-                club.Goals = request.dto.Goals;
-                club.GoalsConceded = request.dto.GoalsConceded;
-                club.CleanSheets = request.dto.CleanSheets;
-                club.YearFounded = request.dto.YearFounded;
+                club.StadiumId = request.Dto.StadiumId;
+                club.Name = request.Dto.Name;
+                club.LeaguePoints = request.Dto.LeaguePoints;
+                club.MatchesPlayed = request.Dto.MatchesPlayed;
+                club.Wins = request.Dto.Wins;
+                club.Losses = request.Dto.Losses;
+                club.Drawns = request.Dto.Draws;
+                club.Goals = request.Dto.Goals;
+                club.GoalsConceded = request.Dto.GoalsConceded;
+                club.CleanSheets = request.Dto.CleanSheets;
+                club.YearFounded = request.Dto.YearFounded;
 
                 await _clubRepository.Update(club);
+
+                return Result<ClubResponseDto>.Success(club.Adapt<ClubResponseDto>());
             }
         }
     }

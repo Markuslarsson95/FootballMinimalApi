@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions;
 
-namespace Application.Commands.Clubs
+namespace Application.Exceptions.Errors
 {
     public static class ClubErrors
     {

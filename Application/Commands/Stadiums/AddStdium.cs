@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
 using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Stadium;
@@ -8,9 +9,9 @@ namespace Application.Commands.Stadiums
 {
     public static class AddStdium
     {
-        public record Command(CreateStadiumDto dto) : ICommand<int>;
+        public record Command(CreateStadiumDto Dto) : ICommand<Result<int>>;
 
-        public class Handler : IRequestHandler<Command, int>
+        public class Handler : IRequestHandler<Command, Result<int>>
         {
             private readonly IStadiumRepository _stadiumRepository;
 
@@ -18,19 +19,19 @@ namespace Application.Commands.Stadiums
             {
                 _stadiumRepository = stadiumRepository;
             }
-            public async Task<int> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<int>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var stadium = new Stadium
                 {
-                    Name = request.dto.Name,
-                    Location = request.dto.Location,
-                    Adress = request.dto.Address,
-                    Capacity = request.dto.Capacity,
-                    YearBuilt = request.dto.YearBuilt
+                    Name = request.Dto.Name,
+                    Location = request.Dto.Location,
+                    Adress = request.Dto.Address,
+                    Capacity = request.Dto.Capacity,
+                    YearBuilt = request.Dto.YearBuilt
                 };
                 await _stadiumRepository.Add(stadium);
 
-                return stadium.Id;
+                return Result<int>.Success(stadium.Id);
             }
         }
     }

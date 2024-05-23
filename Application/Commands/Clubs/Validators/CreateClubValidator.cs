@@ -11,47 +11,47 @@ namespace Application.Commands.Clubs.Validators
         {
             _stadiumRepository = stadiumRepository;
 
-            RuleFor(club => club.dto.Name)
+            RuleFor(club => club.Dto.Name)
                 .NotEmpty()
                 .WithMessage("Ensure the club name is provided.");
 
-            RuleFor(club => club.dto.LeaguePoints)
+            RuleFor(club => club.Dto.LeaguePoints)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the league points are greater than or equal to 0.");
 
-            RuleFor(club => club.dto.MatchesPlayed)
+            RuleFor(club => club.Dto.MatchesPlayed)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the matches played are greater than or equal to 0.");
 
-            RuleFor(club => club.dto.Wins)
+            RuleFor(club => club.Dto.Wins)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the number of wins is greater than or equal to 0.");
 
-            RuleFor(club => club.dto.Losses)
+            RuleFor(club => club.Dto.Losses)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the number of losses is greater than or equal to 0.");
 
-            RuleFor(club => club.dto.Drawns)
+            RuleFor(club => club.Dto.Drawns)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the number of drawns is greater than or equal to 0.");
 
-            RuleFor(club => club.dto.Goals)
+            RuleFor(club => club.Dto.Goals)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the number of goals is greater than or equal to 0.");
 
-            RuleFor(club => club.dto.GoalsConceded)
+            RuleFor(club => club.Dto.GoalsConceded)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the number of goals conceded is greater than or equal to 0.");
 
-            RuleFor(club => club.dto.CleanSheets)
+            RuleFor(club => club.Dto.CleanSheets)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Ensure the number of clean sheets is greater than or equal to 0.");
 
-            RuleFor(club => club.dto.YearFounded)
+            RuleFor(club => club.Dto.YearFounded)
                 .Must(yearFounded => yearFounded <= DateTime.Now.Year)
                 .WithMessage("Ensure the year founded is not in the future.");
 
-            RuleFor(club => club.dto.StadiumId)
+            RuleFor(club => club.Dto.StadiumId)
                 .MustAsync(async (stadiumId, cancellation) =>
                 {
                     var stadium = await _stadiumRepository.GetById(stadiumId);

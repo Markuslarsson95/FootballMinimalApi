@@ -24,7 +24,7 @@ namespace Application.Queries.Clubs
             {
                 var clubs = await _clubRepository.GetAll();
 
-                return clubs.Adapt<IEnumerable<Result<ClubResponseDto>>>();
+                return Result<IEnumerable<ClubResponseDto>>.Success(clubs.Adapt<IEnumerable<ClubResponseDto>>());
             }
         }
     }

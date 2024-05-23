@@ -23,33 +23,31 @@ namespace WebApp.Endpoints
 
         public static async Task<IResult> GetAllClubs(ISender sender)
         {
-            var clubs = await sender.Send(new GetClubs.Query());
-            return TypedResults.Ok(clubs);
+            var result = await sender.Send(new GetClubs.Query());
+            return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> GetClubById(int id, ISender sender)
         {
             var result = await sender.Send(new GetClubById.Query(id));
-
             return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> CreateClub([FromBody] CreateClubDto dto, ISender sender)
         {
-            var newClub = await sender.Send(new AddClub.Command(dto));
-            return TypedResults.Created($"/stadiums/{newClub}", newClub);
+            var result = await sender.Send(new AddClub.Command(dto));
+            return result.IsSuccess ? TypedResults.Created($"/clubs/{result.Value}", result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> UpdateClub(int id, [FromBody] UpdateClubDto updateClubDto, ISender sender)
         {
-            await sender.Send(new UpdateClub.Command(id, updateClubDto));
-            return TypedResults.NoContent();
+            var result = await sender.Send(new UpdateClub.Command(id, updateClubDto));
+            return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> RemoveClub(int id, ISender sender)
         {
             var result = await sender.Send(new DeleteClub.Command(id));
-
             return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
         }
     }

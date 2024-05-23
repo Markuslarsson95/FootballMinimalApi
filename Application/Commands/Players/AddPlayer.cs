@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
 using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Player;
@@ -8,9 +9,9 @@ namespace Application.Commands.Players
 {
     public static class AddPlayer
     {
-        public record Command(CreatePlayerDto dto) : ICommand<int>;
+        public record Command(CreatePlayerDto Dto) : ICommand<Result<int>>;
 
-        public class Handler : IRequestHandler<Command, int>
+        public class Handler : IRequestHandler<Command, Result<int>>
         {
             private readonly IPlayerRepository _playerRepository;
 
@@ -19,22 +20,23 @@ namespace Application.Commands.Players
                 _playerRepository = playerRepository;
             }
 
-            public async Task<int> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<int>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var player = new Player
                 {
-                    FirstName = request.dto.FirstName,
-                    LastName = request.dto.LastName,
-                    ClubId = request.dto.ClubId,
-                    Position = request.dto.Position,
-                    Nationality = request.dto.Nationality,
-                    DateOfBirth = request.dto.DateOfBirth,
-                    KitNumber = request.dto.KitNumber,
-                    Height = request.dto.Height,
+                    FirstName = request.Dto.FirstName,
+                    LastName = request.Dto.LastName,
+                    ClubId = request.Dto.ClubId,
+                    Position = request.Dto.Position,
+                    Nationality = request.Dto.Nationality,
+                    DateOfBirth = request.Dto.DateOfBirth,
+                    KitNumber = request.Dto.KitNumber,
+                    Height = request.Dto.Height,
                 };
 
                 await _playerRepository.Add(player);
-                return player.Id;
+
+                return Result<int>.Success(player.Id);
             }
         }
     }

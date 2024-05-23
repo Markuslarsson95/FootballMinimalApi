@@ -19,6 +19,7 @@ namespace Infrastructure.Repositories
             return await _context.Clubs
                 .Include(x => x.Stadium)
                 .Include(x => x.Players)
+                .OrderByDescending(x => x.LeaguePoints)
                 .ToListAsync();
         }
 

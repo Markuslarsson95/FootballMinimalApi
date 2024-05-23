@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Messaging;
-using Application.Commands.Clubs;
+using Application.Exceptions.Errors;
 using Application.Interfaces;
 using Mapster;
 using MediatR;

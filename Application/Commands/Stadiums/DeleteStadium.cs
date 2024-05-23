@@ -1,16 +1,16 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
 using Application.Interfaces;
 using MediatR;
-using System.Net;
-using WebApp.Exceptions;
 
 namespace Application.Commands.Stadiums
 {
     public static class DeleteStadium
     {
-        public record Command(int id) : ICommand<string>;
+        public record Command(int Id) : ICommand<Result<bool>>;
 
-        public class Handler : IRequestHandler<Command, string>
+        public class Handler : IRequestHandler<Command, Result<bool>>
         {
             private readonly IStadiumRepository _stadiumRepository;
 
@@ -19,15 +19,15 @@ namespace Application.Commands.Stadiums
                 _stadiumRepository = stadiumRepository;
             }
 
-            public async Task<string> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<bool>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var stadium = await _stadiumRepository.GetById(request.id);
+                var stadium = await _stadiumRepository.GetById(request.Id);
                 if (stadium is null)
-                    throw new CommandQueryMessageException($"Can't find stadium with id {request.id}", (int)HttpStatusCode.NotFound);
+                    return Result<bool>.Failure(StadiumErrors.NotFound(request.Id));
 
                 _stadiumRepository.Remove(stadium);
 
-                return $"Stadium with id {request.id} removed";
+                return Result<bool>.Success(true);
             }
         }
     }
