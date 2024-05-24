@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services
-    .AddInfrastructure()
+    .AddInfrastructure(builder.Configuration)
     .AddApplication();
 
 builder.Services.AddCarter();
