@@ -1,17 +1,18 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
+using Application.Interfaces;
 using Mapster;
 using MediatR;
-using System.Net;
 using WebApp.DTOs.Club;
-using WebApp.Exceptions;
 
 namespace Application.Queries.Clubs
 {
     public static class GetClubById
     {
-        public record Query(int Id) : IRequest<ClubResponseDto>;
+        public record Query(int Id) : ICommand<Result<ClubResponseDto>>;
 
-        public class Handler : IRequestHandler<Query, ClubResponseDto>
+        public class Handler : IRequestHandler<Query, Result<ClubResponseDto>>
         {
             private readonly IClubRepository _clubRepository;
 
@@ -20,13 +21,13 @@ namespace Application.Queries.Clubs
                 _clubRepository = clubRepository;
             }
 
-            public async Task<ClubResponseDto> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<ClubResponseDto>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var club = await _clubRepository.GetById(request.Id);
                 if (club is null)
-                    throw new CommandQueryMessageException($"Can't find Club with id {request.Id}.", (int)HttpStatusCode.NotFound);
+                    return Result<ClubResponseDto>.Failure(ClubErrors.NotFound(request.Id));
 
-                return club.Adapt<ClubResponseDto>();
+                return Result<ClubResponseDto>.Success(club.Adapt<ClubResponseDto>());
             }
         }
     }

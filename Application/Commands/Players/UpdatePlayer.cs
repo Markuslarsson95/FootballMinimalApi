@@ -1,17 +1,18 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
 using Application.Interfaces;
+using Mapster;
 using MediatR;
-using System.Net;
 using WebApp.DTOs.Player;
-using WebApp.Exceptions;
 
 namespace Application.Commands.Players
 {
     public static class UpdatePlayer
     {
-        public record Command(int id, UpdatePlayerDto dto) : ICommand;
+        public record Command(int Id, UpdatePlayerDto Dto) : ICommand<Result<PlayerResponseDto>>;
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<PlayerResponseDto>>
         {
             private readonly IPlayerRepository _playerRepository;
 
@@ -20,22 +21,24 @@ namespace Application.Commands.Players
                 _playerRepository = playerRepository;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<PlayerResponseDto>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var player = await _playerRepository.GetById(request.id);
+                var player = await _playerRepository.GetById(request.Id);
                 if (player is null)
-                    throw new CommandQueryMessageException($"Can't find Player with id {request.id}", (int)HttpStatusCode.NotFound);
+                    return Result<PlayerResponseDto>.Failure(PlayerErrors.NotFound(request.Id));
 
-                player.FirstName = request.dto.FirstName;
-                player.LastName = request.dto.LastName;
-                player.ClubId = request.dto.ClubId;
-                player.Position = request.dto.Position;
-                player.Nationality = request.dto.Nationality;
-                player.DateOfBirth = request.dto.DateOfBirth;
-                player.KitNumber = request.dto.KitNumber;
-                player.Height = request.dto.Height;
+                player.FirstName = request.Dto.FirstName;
+                player.LastName = request.Dto.LastName;
+                player.ClubId = request.Dto.ClubId;
+                player.Position = request.Dto.Position;
+                player.Nationality = request.Dto.Nationality;
+                player.DateOfBirth = request.Dto.DateOfBirth;
+                player.KitNumber = request.Dto.KitNumber;
+                player.Height = request.Dto.Height;
 
                 await _playerRepository.Update(player);
+
+                return Result<PlayerResponseDto>.Success(player.Adapt<PlayerResponseDto>());
             }
         }
     }

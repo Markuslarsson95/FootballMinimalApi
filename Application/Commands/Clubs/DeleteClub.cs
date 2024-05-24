@@ -1,16 +1,16 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
 using Application.Interfaces;
 using MediatR;
-using System.Net;
-using WebApp.Exceptions;
 
 namespace Application.Commands.Clubs
 {
     public static class DeleteClub
     {
-        public record Command(int id) : ICommand;
+        public record Command(int Id) : ICommand<Result<bool>>;
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<bool>>
         {
             private readonly IClubRepository _clubRepository;
 
@@ -19,13 +19,15 @@ namespace Application.Commands.Clubs
                 _clubRepository = clubRepository;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<bool>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var club = await _clubRepository.GetById(request.id);
+                var club = await _clubRepository.GetById(request.Id);
                 if (club is null)
-                    throw new CommandQueryMessageException($"Can't find Club with id {request.id}", (int)HttpStatusCode.NotFound);
+                    return Result<bool>.Failure(ClubErrors.NotFound(request.Id));
 
                 _clubRepository.Remove(club);
+
+                return Result<bool>.Success(true);
             }
         }
     }

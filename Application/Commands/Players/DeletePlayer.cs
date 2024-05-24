@@ -1,16 +1,16 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
 using Application.Interfaces;
 using MediatR;
-using System.Net;
-using WebApp.Exceptions;
 
 namespace Application.Commands.Players
 {
     public static class DeletePlayer
     {
-        public record Command(int id) : ICommand;
+        public record Command(int Id) : ICommand<Result<bool>>;
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<bool>>
         {
             private readonly IPlayerRepository _playerRepository;
 
@@ -19,13 +19,15 @@ namespace Application.Commands.Players
                 _playerRepository = playerRepository;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<bool>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var player = await _playerRepository.GetById(request.id);
+                var player = await _playerRepository.GetById(request.Id);
                 if (player is null)
-                    throw new CommandQueryMessageException($"Can't find Player with id {request.id}", (int)HttpStatusCode.NotFound);
+                    return Result<bool>.Failure(PlayerErrors.NotFound(request.Id));
 
                 _playerRepository.Remove(player);
+
+                return Result<bool>.Success(true);
             }
         }
     }

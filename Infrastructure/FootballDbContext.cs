@@ -22,9 +22,10 @@ namespace WebApp
         {
             base.OnModelCreating(modelBuilder);
 
+            //Seed data
             DbSeedData.SeedStadiums(modelBuilder);
-
             DbSeedData.SeedClubs(modelBuilder);
+            DbSeedData.SeedPlayers(modelBuilder);
         }
     }
 }

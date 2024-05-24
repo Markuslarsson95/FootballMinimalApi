@@ -4,6 +4,7 @@ using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.DTOs.Player;
+using WebApp.Extensions;
 
 namespace WebApp.Endpoints
 {
@@ -22,32 +23,32 @@ namespace WebApp.Endpoints
 
         public static async Task<IResult> GetAllPlayers(ISender sender)
         {
-            var players = await sender.Send(new GetPlayers.Query());
-            return TypedResults.Ok(players);
+            var result = await sender.Send(new GetPlayers.Query());
+            return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> GetPlayerById(int id, ISender sender)
         {
-            var player = await sender.Send(new GetPlayerById.Query(id));
-            return TypedResults.Ok(player);
+            var result = await sender.Send(new GetPlayerById.Query(id));
+            return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> CreatePayer([FromBody] CreatePlayerDto dto, ISender sender)
         {
-            var newPlayer = await sender.Send(new AddPlayer.Command(dto));
-            return TypedResults.Created($"/players/{newPlayer}", newPlayer);
+            var result = await sender.Send(new AddPlayer.Command(dto));
+            return result.IsSuccess ? TypedResults.Created($"/players/{result.Value}", result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> UpdatePlayer(int id, [FromBody] UpdatePlayerDto dto, ISender sender)
         {
-            await sender.Send(new UpdatePlayer.Command(id, dto));
-            return TypedResults.NoContent();
+            var result = await sender.Send(new UpdatePlayer.Command(id, dto));
+            return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
         }
 
         public static async Task<IResult> RemovePlayer(int id, ISender sender)
         {
-            await sender.Send(new DeletePlayer.Command(id));
-            return TypedResults.NoContent();
+            var result = await sender.Send(new DeletePlayer.Command(id));
+            return result.IsSuccess ?  TypedResults.NoContent() : result.ToProblemDetails();
         }
     }
 }

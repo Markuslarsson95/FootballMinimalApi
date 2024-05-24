@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Messaging;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
 using Application.Interfaces;
 using MediatR;
 using WebApp.DTOs.Club;
@@ -8,9 +9,9 @@ namespace Application.Commands.Clubs
 {
     public static class AddClub
     {
-        public record Command(CreateClubDto dto) : ICommand<int>;
+        public record Command(CreateClubDto Dto) : ICommand<Result<int>>;
 
-        public class Handler : IRequestHandler<Command, int>
+        public class Handler : IRequestHandler<Command, Result<int>>
         {
             private readonly IClubRepository _clubRepository;
 
@@ -18,25 +19,25 @@ namespace Application.Commands.Clubs
             {
                 _clubRepository = clubRepository;
             }
-            public async Task<int> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<int>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var club = new Club
                 {
-                    StadiumId = request.dto.StadiumId,
-                    Name = request.dto.Name,
-                    LeaguePoints = request.dto.LeaguePoints,
-                    MatchesPlayed = request.dto.MatchesPlayed,
-                    Wins = request.dto.Wins,
-                    Losses = request.dto.Losses,
-                    Drawns = request.dto.Drawns,
-                    Goals = request.dto.Goals,
-                    GoalsConceded = request.dto.GoalsConceded,
-                    CleanSheets = request.dto.CleanSheets,
-                    YearFounded = request.dto.YearFounded
+                    StadiumId = request.Dto.StadiumId,
+                    Name = request.Dto.Name,
+                    LeaguePoints = request.Dto.LeaguePoints,
+                    MatchesPlayed = request.Dto.MatchesPlayed,
+                    Wins = request.Dto.Wins,
+                    Losses = request.Dto.Losses,
+                    Drawns = request.Dto.Drawns,
+                    Goals = request.Dto.Goals,
+                    GoalsConceded = request.Dto.GoalsConceded,
+                    CleanSheets = request.Dto.CleanSheets,
+                    YearFounded = request.Dto.YearFounded
                 };
                 await _clubRepository.Add(club);
 
-                return club.Id;
+                return Result<int>.Success(club.Id);
             }
         }
     }

@@ -1,17 +1,18 @@
-﻿using Application.Interfaces;
+﻿using Application.Abstractions;
+using Application.Abstractions.Messaging;
+using Application.Exceptions.Errors;
+using Application.Interfaces;
 using Mapster;
 using MediatR;
-using System.Net;
 using WebApp.DTOs.Stadium;
-using WebApp.Exceptions;
 
 namespace Application.Queries.Stadium
 {
     public static class GetStadiumById
     {
-        public record Query(int Id) : IRequest<StadiumResponseDto>;
+        public record Query(int Id) : ICommand<Result<StadiumResponseDto>>;
 
-        public class Handler : IRequestHandler<Query, StadiumResponseDto>
+        public class Handler : IRequestHandler<Query, Result<StadiumResponseDto>>
         {
             private readonly IStadiumRepository _stadiumRepository;
 
@@ -20,13 +21,13 @@ namespace Application.Queries.Stadium
                 _stadiumRepository = stadiumRepository;
             }
 
-            public async Task<StadiumResponseDto> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<StadiumResponseDto>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var stadium = await _stadiumRepository.GetById(request.Id);
                 if (stadium is null)
-                    throw new CommandQueryMessageException($"Can't find Stadium with id {request.Id}.", (int)HttpStatusCode.NotFound);
+                    return Result<StadiumResponseDto>.Failure(StadiumErrors.NotFound(request.Id));
 
-                return stadium.Adapt<StadiumResponseDto>();
+                return Result<StadiumResponseDto>.Success(stadium.Adapt<StadiumResponseDto>());
             }
         }
     }
